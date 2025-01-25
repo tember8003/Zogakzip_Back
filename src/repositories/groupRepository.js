@@ -35,7 +35,6 @@ async function getDetail(group) {
                 select: {
                     //공개 범위 id 제외용
                     name: true,
-                    description: true,
                 }
             },
             createdAt: true,
