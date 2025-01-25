@@ -53,8 +53,8 @@ const upload = multer({
 
 groupController.post('/', upload.single('Image'), async (req, res, next) => {
     try {
-        //console.log("Multer - req.file:", req.file); // 업로드된 파일 정보
-        //console.log("Multer - req.body:", req.body); // 요청 본문 데이터
+        console.log("Multer - req.file:", req.file); // 업로드된 파일 정보
+        console.log("Multer - req.body:", req.body); // 요청 본문 데이터
 
         if (!req.file) {
             console.error("Multer - 파일이 업로드되지 않았습니다.");
