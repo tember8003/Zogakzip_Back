@@ -29,14 +29,15 @@ async function getDetail(group) {
             id: true,
             name: true,
             isPublic: true,
+            imageUrl: true,
             likeCount: true,
-            postCount: true,
             Badge: {
                 select: {
                     //공개 범위 id 제외용
                     name: true,
                 }
             },
+            postCount: true,
             createdAt: true,
             password: false, // password 필드 제외
             introduction: true,
