@@ -1,0 +1,7 @@
+//그룹 조회 권한 확인 - 실패
+POST http://localhost:3000/api/groups/1/verify-password
+Content-Type: application/json
+
+{
+	"password":"123"
+}
