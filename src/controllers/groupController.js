@@ -181,6 +181,8 @@ groupController.post('/:id/verify-password', async (req, res, next) => {
     try {
         const groupId = parseInt(req.params.id, 10);
 
+        console.log('Request Body:', req.body);
+
         // 요청 본문에서 비밀번호 추출
         const password = req.body.password;
 
