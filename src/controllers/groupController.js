@@ -66,9 +66,10 @@ groupController.post('/', upload.single('Image'), async (req, res, next) => {
         if (!name || !password) {
             return res.status(400).json({ message: '이름과 비밀번호는 필수 사항입니다.' });
         }
+        const isPublicBoolean = isPublic === "true";
 
         const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`;
-        const groupData = { name, password, isPublic: Boolean(isPublic), introduction, imageUrl };
+        const groupData = { name, password, isPublic: isPublicBoolean, introduction, imageUrl };
 
         const group = await groupService.createGroup(groupData);
 
