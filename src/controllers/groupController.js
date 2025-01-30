@@ -88,7 +88,7 @@ groupController.post('/', upload.single('Image'), async (req, res, next) => {
 groupController.get('/', async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1; //현재 페이지
-        const pageSize = parseInt(req.query.pageSize) || 24; //1페이지당 보여줄 페이지 수
+        const pageSize = parseInt(req.query.pageSize) || 100; //1페이지당 보여줄 페이지 수
         const sortBy = req.query.sortBy || null; //정렬 기준
 
         let isPublic = true; //공개 비공개 확인용
