@@ -113,11 +113,6 @@ groupController.put('/:id', upload.single('image'), async (req, res, next) => {
         console.log("Multer - req.file:", req.file); // 업로드된 파일 정보
         console.log("Multer - req.body:", req.body); // 요청 본문 데이터
 
-        if (!req.file) {
-            console.error("Multer - 파일이 업로드되지 않았습니다.");
-            return res.status(400).json({ message: '파일이 업로드되지 않았습니다.' });
-        }
-
         const groupId = parseInt(req.params.id, 10);
 
         const inputPassword = req.body.password;
