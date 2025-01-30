@@ -7,6 +7,8 @@ async function createPost(post, groupId) {
     //id로 게시글 찾기
     const existedGroup = await groupRepository.findById(groupId);
 
+    console.log(post);
+
     //게시글이 존재하지 않으면 에러처리
     if (!existedGroup) {
         const error = new Error('존재하지 않습니다.');
@@ -14,6 +16,9 @@ async function createPost(post, groupId) {
         error.data = { id: groupId };
         throw error;
     }
+
+    console.log("DB 저장된 해시된 비밀번호:", existedGroup.password);
+    console.log("입력된 비밀번호:", post.password);
 
     const check = await bcrypt.compare(post.password, existedGroup.password);
     if (!check) {
