@@ -12,9 +12,6 @@ import commentController from './controllers/commentController.js';
 
 const app = express();
 
-// JSON 본문 파싱 미들웨어
-app.use(express.json());
-
 // CORS 설정
 app.use(cors({
     origin: [
@@ -22,8 +19,13 @@ app.use(cors({
         'http://localhost:3000'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }))
+
+// JSON 본문 파싱 미들웨어
+app.use(express.json());
+
 
 // 기본 라우터
 app.get('/', (req, res) => {
