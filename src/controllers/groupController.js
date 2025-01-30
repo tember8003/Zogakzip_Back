@@ -108,17 +108,28 @@ groupController.get('/', async (req, res, next) => {
 });
 
 //그룹 수정
-groupController.put('/:id', async (req, res, next) => {
+groupController.put('/:id', upload.single('Image'), async (req, res, next) => {
     try {
+        console.log("Multer - req.file:", req.file); // 업로드된 파일 정보
+        console.log("Multer - req.body:", req.body); // 요청 본문 데이터
+
+        if (!req.file) {
+            console.error("Multer - 파일이 업로드되지 않았습니다.");
+            return res.status(400).json({ message: '파일이 업로드되지 않았습니다.' });
+        }
+
         const groupId = parseInt(req.params.id, 10);
+
         const inputPassword = req.body.password;
         if (!inputPassword) {
             return res.status(404).json({ message: '잘못된 요청입니다.' });
         }
+        const isPublicBoolean = isPublic === "true";
+        const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`;
 
-        console.log(groupId + "님의 수정 요청이 있습니다! 비밀번호:" + password);
+        console.log(groupId + "님의 수정 요청이 있습니다! 비밀번호:" + inputPassword);
 
-        const groupData = { ...req.body, id: groupId };
+        const groupData = { ...req.body, password: inputPassword, imageUrl: imageUrl, isPublic: isPublicBoolean, id: groupId };
 
         const group = await groupService.updateGroup(groupData);
         return res.status(201).json(group);
