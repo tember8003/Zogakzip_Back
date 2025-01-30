@@ -17,10 +17,13 @@ app.use(express.json());
 
 // CORS 설정
 app.use(cors({
-    origin: process.env.CLIENT_ORIGIN || '*',
+    origin: [
+        'http://zogakzip.react.codeit.s3-website-ap-southeast-2.amazonaws.com',
+        'http://localhost:3000'
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-}));
-app.options('*', cors());
+    allowedHeaders: ['Content-Type', 'Authorization']
+}))
 
 // 기본 라우터
 app.get('/', (req, res) => {
