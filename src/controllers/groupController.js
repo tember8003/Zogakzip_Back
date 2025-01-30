@@ -108,7 +108,7 @@ groupController.get('/', async (req, res, next) => {
 });
 
 //그룹 수정
-groupController.put('/:id', upload.single('Image'), async (req, res, next) => {
+groupController.put('/:id', upload.single('image'), async (req, res, next) => {
     try {
         console.log("Multer - req.file:", req.file); // 업로드된 파일 정보
         console.log("Multer - req.body:", req.body); // 요청 본문 데이터
