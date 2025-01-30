@@ -116,6 +116,7 @@ groupController.put('/:id', async (req, res, next) => {
             return res.status(404).json({ message: '잘못된 요청입니다.' });
         }
 
+        console.log(groupId + "님의 수정 요청이 있습니다! 비밀번호:" + password);
 
         const groupData = { ...req.body, id: groupId };
 
@@ -141,6 +142,8 @@ groupController.delete('/:id', async (req, res, next) => {
         if (!groupId || !password) {
             return res.status(400).json({ message: '잘못된 요청입니다.' });
         }
+
+        console.log(groupId + "님의 삭제 요청이 있습니다! 비밀번호:" + password);
 
         const deletedGroup = await groupService.deleteGroup({ id: groupId }, password);
 
