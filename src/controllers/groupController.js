@@ -124,7 +124,7 @@ groupController.put('/:id', upload.single('Image'), async (req, res, next) => {
         if (!inputPassword) {
             return res.status(404).json({ message: '잘못된 요청입니다.' });
         }
-        const isPublicBoolean = isPublic === "true";
+        const isPublicBoolean = req.body.isPublic === "true";
         const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`;
 
         console.log(groupId + "님의 수정 요청이 있습니다! 비밀번호:" + inputPassword);
