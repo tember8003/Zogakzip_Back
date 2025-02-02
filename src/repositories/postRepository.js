@@ -19,8 +19,9 @@ async function createPost(post, groupId) {
 			isPublic: post.isPublic,
 			password: hashedPassword,
 			groupId: groupId,
-			// ✅ tags 필드가 아니라 PostTag 테이블을 통해 태그 연결
-			PostTag: {
+
+			// ✅ `PostTag`를 직접 참조하지 말고 `tags`를 사용해야 함
+			tags: {
 				create: post.tags.map(tagName => ({
 					tag: {
 						connectOrCreate: {
