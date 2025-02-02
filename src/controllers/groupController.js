@@ -128,7 +128,10 @@ groupController.put('/:id', upload.single('image'), async (req, res, next) => {
         const groupData = { ...req.body, password: inputPassword, imageUrl: imageUrl, isPublic: isPublicBoolean, id: groupId };
 
         const group = await groupService.updateGroup(groupData);
-        return res.status(201).json(group);
+        return res.status(201).json({
+            message: "그룹이 성공적으로 수정되었습니다.",
+            group
+        });
     } catch (error) {
         if (error.code === 404) {
             res.status(404).json({ message: "존재하지 않습니다." });
