@@ -261,6 +261,17 @@ groupController.post('/:id/posts', upload.single('PostImage'), async (req, res, 
         if (!nickname || !title || !password || !content) {
             return res.status(400).json({ message: '잘못된 요청입니다. - 닉네임, 제목, 비밀번호는 필수사항입니다.' });
         }
+        // tags가 전달되었을 때 배열로 처리
+        let tagArray = [];
+        if (tags) {
+            if (Array.isArray(tags)) {
+                // 이미 배열인 경우
+                tagArray = tags;
+            } else if (typeof tags === 'string') {
+                // 콤마로 구분된 문자열인 경우
+                tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+            }
+        }
 
         const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`;
 
@@ -270,7 +281,7 @@ groupController.post('/:id/posts', upload.single('PostImage'), async (req, res, 
             title,
             imageUrl,
             content,
-            //tags: tags || [], // 기본값으로 빈 배열
+            tags: tagArray,
             location,
             moment: new Date(moment),
             isPublic: Boolean(isPublic),

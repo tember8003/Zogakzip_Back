@@ -15,11 +15,16 @@ async function createPost(post, groupId) {
 			content: post.content,
 			likeCount: 0,
 			commentCount: 0,
-			/*
-			tag: {
-				set: post.tag,
+			tags: {
+				create: post.tags.map(tagName => ({
+					tag: {
+						connectOrCreate: {
+							where: { name: tagName },
+							create: { name: tagName },
+						},
+					},
+				})),
 			},
-			*/
 			location: post.location,
 			moment: post.moment,
 			isPublic: post.isPublic,
