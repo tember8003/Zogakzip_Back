@@ -277,7 +277,11 @@ groupController.post('/:id/posts', upload.single('PostImage'), async (req, res, 
             }
         }
 
-        const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`;
+        const imageUrl = req.file
+            ? `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`
+            : null;
+
+        console.log(groupId + "님의 게시글 요청이 있습니다~" + "\n" + req.body)
 
         // 입력 데이터 정리
         const postData = {
