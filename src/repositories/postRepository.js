@@ -9,6 +9,30 @@ async function createPost(post, groupId) {
 	// tags가 전달되지 않았거나 빈 배열이면 기본값을 빈 배열로 설정
 	const tags = Array.isArray(post.tags) ? post.tags : [];
 
+	// 1️⃣ 태그 이름 배열을 기반으로 기존 태그를 검색
+	const existingTags = await prisma.tag.findMany({
+		where: {
+			name: { in: tags },
+		},
+	});
+
+	// 2️⃣ 데이터베이스에 없는 새 태그 생성
+	const existingTagNames = existingTags.map(tag => tag.name);
+	const newTags = tags.filter(tagName => !existingTagNames.includes(tagName));
+
+	// 새 태그 생성
+	const createdTags = await Promise.all(
+		newTags.map(tagName =>
+			prisma.tag.create({
+				data: { name: tagName },
+			})
+		)
+	);
+
+	// 3️⃣ 기존 태그와 새 태그 합치기
+	const allTags = [...existingTags, ...createdTags];
+
+	// 4️⃣ Prisma `post.create` 호출
 	return prisma.post.create({
 		data: {
 			nickname: post.nickname,
@@ -23,16 +47,15 @@ async function createPost(post, groupId) {
 			password: hashedPassword,
 			groupId: groupId,
 
-			// ✅ Many-to-Many 관계 처리 (빈 배열일 경우에도 작동)
+			// Many-to-Many 관계에서 태그 연결
 			tags: {
-				connectOrCreate: tags.map(tagName => ({
-					where: { name: tagName },
-					create: { name: tagName }
-				}))
-			}
-		}
+				connect: allTags.map(tag => ({ id: tag.id })), // 태그 ID 기반으로 연결
+			},
+		},
 	});
 }
+
+
 async function findById(postId) {
 	return prisma.post.findUnique({
 		where: {
