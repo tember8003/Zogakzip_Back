@@ -19,22 +19,16 @@ async function createPost(post, groupId) {
 			password: hashedPassword,
 			groupId: groupId,
 
-			// ✅ PostTag를 사용하여 Many-to-Many 관계 설정
-			PostTag: {
-				create: post.tags.map(tagName => ({
-					tag: {
-						connectOrCreate: {
-							where: { name: tagName },
-							create: { name: tagName }
-						}
-					}
+			// ✅ Many-to-Many 관계: `tags`를 사용하여 Prisma가 자동으로 PostTag 관리
+			tags: {
+				connectOrCreate: post.tags.map(tagName => ({
+					where: { name: tagName },
+					create: { name: tagName }
 				}))
 			}
 		}
 	});
 }
-
-
 
 async function findById(postId) {
 	return prisma.post.findUnique({

@@ -26,18 +26,7 @@ model Tag {
     id   Int    @id @default(autoincrement())
     name String @unique
 
-    // ✅ Many-to-Many 관계 (PostTag를 통해 연결)
-    PostTag PostTag[]
-}
-
-model PostTag {
-    postId Int
-    tagId  Int
-
-    post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-    tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-    @@id([postId, tagId]) // ✅ Many-to-Many 관계 설정
+    posts Post[] // ✅ Many-to-Many 관계 설정
 }
 
 model Comment {
@@ -77,5 +66,5 @@ model Post {
     groupId      Int
     Comment      Comment[]
 
-    PostTag PostTag[]
+    tags Tag[] // ✅ Many-to-Many 관계 설정
 }
