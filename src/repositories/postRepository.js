@@ -1,8 +1,12 @@
-import prisma from "../config/prisma.js";
+import prisma from '../config/prisma.js';
 import bcrypt from 'bcrypt';
 
 //게시글 등록(닉네임, 제목, 이미지<한장>,본문,태그, 장소, 추억의 순간, 추억공개여부, 비밀번호 입력)
 async function createPost(post, groupId) {
+	console.log("prisma 객체", prisma);
+	console.log("prisma 모델", Object.keys(prisma));
+	console.log("prisma tag 모델", prisma.tag);
+
 	// 비밀번호 해싱
 	const hashedPassword = await bcrypt.hash(post.password, 10);
 
