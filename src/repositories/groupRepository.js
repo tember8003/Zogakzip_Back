@@ -143,6 +143,7 @@ async function getPosts(skip, take, orderBy, name, publicCheck, groupId) {
             imageUrl: true,
             location: true,
             moment: true,
+            tags: true,
             isPublic: true,
             likeCount: true,
             commentCount: true,
