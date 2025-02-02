@@ -256,7 +256,7 @@ groupController.get('/:id/is-public', async (req, res, next) => {
 groupController.post('/:id/posts', upload.single('image'), async (req, res, next) => {
     try {
         const groupId = parseInt(req.params.id, 10);
-        console.log(groupId + "님의 게시글 요청이 있습니다~" + "\n" + req.body)
+        console.log(`${groupId}님의 게시글 요청이 있습니다~\n${JSON.stringify(req.body, null, 2)}`);
 
         const { nickname, title, content, location, moment, isPublic, tags } = req.body;
 
