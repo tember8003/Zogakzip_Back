@@ -3,45 +3,31 @@ import bcrypt from 'bcryptjs';
 
 //게시글 등록(닉네임, 제목, 이미지<한장>,본문,태그, 장소, 추억의 순간, 추억공개여부, 비밀번호 입력)
 async function createPost(post, groupId) {
-	//console.log("prisma 객체", prisma);
-	//console.log("prisma 모델", Object.keys(prisma));
-	console.log("prisma tag 모델", prisma.tag);
-
-	// 비밀번호 해싱
 	const hashedPassword = await bcrypt.hash(post.password, 10);
-
-	// tags가 전달되지 않았거나 빈 배열이면 기본값을 빈 배열로 설정
 	const tags = Array.isArray(post.tags) ? post.tags : [];
 
-	// 1️⃣ 태그 이름 배열을 기반으로 기존 태그를 검색
+	// 기존 태그 찾기
 	const existingTags = await prisma.tag.findMany({
-		where: {
-			name: { in: tags },
-		},
+		where: { name: { in: tags } }
 	});
 
-	// 2️⃣ 데이터베이스에 없는 새 태그 생성
+	// 없는 태그 생성
 	const existingTagNames = existingTags.map(tag => tag.name);
 	const newTags = tags.filter(tagName => !existingTagNames.includes(tagName));
 
-	// 새 태그 생성
 	const createdTags = await Promise.all(
-		newTags.map(tagName =>
-			prisma.tag.create({
-				data: { name: tagName },
-			})
-		)
+		newTags.map(tagName => prisma.tag.create({ data: { name: tagName } }))
 	);
 
-	// 3️⃣ 기존 태그와 새 태그 합치기
+	// 모든 태그 모으기
 	const allTags = [...existingTags, ...createdTags];
 
-	// 4️⃣ Prisma `post.create` 호출
+	// 게시글 생성
 	return prisma.post.create({
 		data: {
 			nickname: post.nickname,
 			title: post.title,
-			imageUrl: post.imageUrl || null, // 이미지가 없을 경우 null 처리
+			imageUrl: post.imageUrl || null,
 			content: post.content,
 			likeCount: 0,
 			commentCount: 0,
@@ -51,13 +37,14 @@ async function createPost(post, groupId) {
 			password: hashedPassword,
 			groupId: groupId,
 
-			// Many-to-Many 관계에서 태그 연결
+			// 태그 연결
 			tags: {
-				connect: allTags.map(tag => ({ id: tag.id })), // 태그 ID 기반으로 연결
+				connect: allTags.map(tag => ({ id: tag.id })),
 			},
 		},
 	});
 }
+
 
 
 async function findById(postId) {
