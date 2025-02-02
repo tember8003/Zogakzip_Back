@@ -109,7 +109,7 @@ async function getDetail(postId) {
 			title: true,
 			imageUrl: true,
 			content: true,
-			//tags: true,
+			tags: true,
 			location: true,
 			moment: true,
 			isPublic: true,
