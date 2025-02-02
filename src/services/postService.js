@@ -9,7 +9,7 @@ async function createPost(post, groupId) {
 
     console.log(post);
 
-    //게시글이 존재하지 않으면 에러처리
+    //그룹이 존재하지 않으면 에러처리
     if (!existedGroup) {
         const error = new Error('존재하지 않습니다.');
         error.code = 404;
