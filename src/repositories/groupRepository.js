@@ -127,23 +127,29 @@ async function getPosts(skip, take, orderBy, name, publicCheck, groupId) {
         where: {
             groupId: groupId, // 그룹 ID로 필터링
             isPublic: publicCheck, // 공개 여부 필터링
-            ...(name && { // name 필터링이 있을 때만 적용
-                title: {
-                    contains: name, // 제목에 name을 포함하는 게시물만 조회
-                },
+            ...(name && {
+                title: { contains: name }, // 제목에 name 포함된 게시글 조회
             }),
         },
         orderBy: orderBy || undefined, // 정렬 옵션
         skip: skip, // 페이지 시작 번호
         take: take, // 페이지 크기
-        select: { // 필요한 필드 선택
+        include: { // `tags` 필드에 연결된 `tag.name` 가져오기
+            tags: {
+                include: {
+                    tag: {
+                        select: { name: true }, // `Tag.name`만 선택
+                    },
+                },
+            },
+        },
+        select: {
             id: true,
             nickname: true,
             title: true,
             imageUrl: true,
             location: true,
             moment: true,
-            tags: true,
             isPublic: true,
             likeCount: true,
             commentCount: true,
@@ -151,8 +157,13 @@ async function getPosts(skip, take, orderBy, name, publicCheck, groupId) {
         },
     });
 
-    return posts;
+    // ✅ `tags` 배열을 가공하여 `{ id, title, ..., tags: ["태그1", "태그2"] }` 형태로 변환
+    return posts.map(post => ({
+        ...post,
+        tags: post.tags.map(tag => tag.tag.name), // `tag` 객체에서 `name`만 추출
+    }));
 }
+
 
 //그룹 수 세기
 async function countGroups(name, publicCheck) {
