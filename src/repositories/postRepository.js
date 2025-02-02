@@ -3,10 +3,9 @@ import bcrypt from 'bcrypt';
 
 //게시글 등록(닉네임, 제목, 이미지<한장>,본문,태그, 장소, 추억의 순간, 추억공개여부, 비밀번호 입력)
 async function createPost(post, groupId) {
-	//비밀번호 해싱 작업
+	// 비밀번호 해싱
 	const hashedPassword = await bcrypt.hash(post.password, 10);
 
-	// 요청에 보낼 데이터
 	return prisma.post.create({
 		data: {
 			nickname: post.nickname,
@@ -15,24 +14,26 @@ async function createPost(post, groupId) {
 			content: post.content,
 			likeCount: 0,
 			commentCount: 0,
-			tags: {
-				create: post.tags.map(tagName => ({
-					tag: {
-						connectOrCreate: {
-							where: { name: tagName },
-							create: { name: tagName },
-						},
-					},
-				})),
-			},
 			location: post.location,
 			moment: post.moment,
 			isPublic: post.isPublic,
 			password: hashedPassword,
 			groupId: groupId,
-		},
+			// ✅ tags 필드가 아니라 PostTag 테이블을 통해 태그 연결
+			PostTag: {
+				create: post.tags.map(tagName => ({
+					tag: {
+						connectOrCreate: {
+							where: { name: tagName },
+							create: { name: tagName }
+						}
+					}
+				}))
+			}
+		}
 	});
 }
+
 
 async function findById(postId) {
 	return prisma.post.findUnique({
