@@ -1,6 +1,6 @@
 import commentRepository from "../repositories/commentRepository.js";
 import postRepository from "../repositories/postRepository.js";
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 //댓글 추가
 async function addComment(comment, postId) {

@@ -1,6 +1,6 @@
 import postRepository from '../repositories/postRepository.js';
 import groupRepository from '../repositories/groupRepository.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 //게시글 생성하기
 async function createPost(post, groupId) {

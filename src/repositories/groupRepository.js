@@ -1,5 +1,5 @@
 import prisma from "../config/prisma.js";
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 //이름으로 그룹 찾기
 async function findByName(name) {

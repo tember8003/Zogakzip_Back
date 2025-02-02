@@ -1,5 +1,5 @@
 import prisma from "../config/prisma.js";
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 //id로 댓글 찾기
 async function findById(commentId) {

@@ -1,6 +1,6 @@
 import groupRepository from "../repositories/groupRepository.js";
 import badgeRepository from "../repositories/badgeRepository.js";
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 //그룹 생성하기
 async function createGroup(group) {
