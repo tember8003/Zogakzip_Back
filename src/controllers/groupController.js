@@ -255,11 +255,12 @@ groupController.get('/:id/is-public', async (req, res, next) => {
 //게시글 등록
 groupController.post('/:id/posts', upload.single('PostImage'), async (req, res, next) => {
     try {
-        const { nickname, title, content, location, moment, isPublic, } = req.body;
-        //나중에 tag도 추가
+        const groupId = parseInt(req.params.id, 10);
+        console.log(groupId + "님의 게시글 요청이 있습니다~" + "\n" + req.body)
+
+        const { nickname, title, content, location, moment, isPublic, tags } = req.body;
 
         const password = req.body.password;
-        const groupId = parseInt(req.params.id, 10);
 
         // 필수 입력값 확인
         if (!nickname || !title || !password || !content) {
@@ -281,7 +282,6 @@ groupController.post('/:id/posts', upload.single('PostImage'), async (req, res, 
             ? `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`
             : null;
 
-        console.log(groupId + "님의 게시글 요청이 있습니다~" + "\n" + req.body)
 
         // 입력 데이터 정리
         const postData = {
