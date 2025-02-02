@@ -134,35 +134,31 @@ async function getPosts(skip, take, orderBy, name, publicCheck, groupId) {
         orderBy: orderBy || undefined, // 정렬 옵션
         skip: skip, // 페이지 시작 번호
         take: take, // 페이지 크기
-        include: { // `tags` 필드에 연결된 `tag.name` 가져오기
+        include: { // ✅ `tags` 필드에 연결된 `tag.name` 가져오기
             tags: {
                 include: {
-                    tag: {
-                        select: { name: true }, // `Tag.name`만 선택
-                    },
+                    tag: true, // ✅ `tag` 객체 전체 포함
                 },
             },
-        },
-        select: {
-            id: true,
-            nickname: true,
-            title: true,
-            imageUrl: true,
-            location: true,
-            moment: true,
-            isPublic: true,
-            likeCount: true,
-            commentCount: true,
-            createdAt: true,
         },
     });
 
     // ✅ `tags` 배열을 가공하여 `{ id, title, ..., tags: ["태그1", "태그2"] }` 형태로 변환
     return posts.map(post => ({
-        ...post,
-        tags: post.tags.map(tag => tag.tag.name), // `tag` 객체에서 `name`만 추출
+        id: post.id,
+        nickname: post.nickname,
+        title: post.title,
+        imageUrl: post.imageUrl,
+        location: post.location,
+        moment: post.moment,
+        isPublic: post.isPublic,
+        likeCount: post.likeCount,
+        commentCount: post.commentCount,
+        createdAt: post.createdAt,
+        tags: post.tags.map(tag => tag.tag.name), // ✅ `tag` 객체에서 `name`만 추출
     }));
 }
+
 
 
 //그룹 수 세기
