@@ -253,7 +253,7 @@ groupController.get('/:id/is-public', async (req, res, next) => {
 })
 
 //게시글 등록
-groupController.post('/:id/posts', upload.single('PostImage'), async (req, res, next) => {
+groupController.post('/:id/posts', upload.single('image'), async (req, res, next) => {
     try {
         const groupId = parseInt(req.params.id, 10);
         console.log(groupId + "님의 게시글 요청이 있습니다~" + "\n" + req.body)
