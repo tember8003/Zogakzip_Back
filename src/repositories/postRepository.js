@@ -20,7 +20,7 @@ async function createPost(post, groupId) {
 			password: hashedPassword,
 			groupId: groupId,
 
-			// ✅ `PostTag`를 직접 참조하지 말고 `tags`를 사용해야 함
+			// ✅ `PostTag`를 통해 Many-to-Many 관계 처리
 			tags: {
 				create: post.tags.map(tagName => ({
 					tag: {
@@ -34,6 +34,7 @@ async function createPost(post, groupId) {
 		}
 	});
 }
+
 
 
 async function findById(postId) {
