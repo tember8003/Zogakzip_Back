@@ -252,13 +252,14 @@ groupController.get('/:id/is-public', async (req, res, next) => {
     }
 })
 
-//게시글 등록
 groupController.post('/:id/posts', upload.single('image'), async (req, res, next) => {
     try {
         const groupId = parseInt(req.params.id, 10);
-        const { nickname, title, content, location, moment, isPublic, tags } = req.body;
-        const password = req.body.password;
+        console.log(`${groupId}님의 게시글 요청이 있습니다~\n${JSON.stringify(req.body, null, 2)}`);
 
+        const { nickname, title, content, location, moment, isPublic, tags } = req.body;
+
+        const password = req.body.password;
         const isPublicBoolean = isPublic === "true";
 
         // 필수 입력값 확인
@@ -266,28 +267,45 @@ groupController.post('/:id/posts', upload.single('image'), async (req, res, next
             return res.status(400).json({ message: '잘못된 요청입니다. - 닉네임, 제목, 비밀번호는 필수사항입니다.' });
         }
 
+        // ✅ tags 변환: 문자열인지 확인하고 처리
+        let tagArray = [];
+        if (tags) {
+            if (Array.isArray(tags)) {
+                tagArray = tags; // 이미 배열인 경우 그대로 사용
+            } else if (typeof tags === 'string') {
+                tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+            }
+        }
+
         const imageUrl = req.file
             ? `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`
             : null;
 
+        // 입력 데이터 정리
         const postData = {
             nickname,
             title,
             imageUrl,
             content,
-            tags: Array.isArray(tags) ? tags : tags.split(',').map(tag => tag.trim()),
+            tags: tagArray, // 변환된 태그 배열
             location,
             moment: new Date(moment),
             isPublic: isPublicBoolean,
             password,
         };
 
+        // 추억 등록 서비스 호출
         const post = await postService.createPost(postData, groupId);
         return res.status(201).json(post);
     } catch (error) {
-        next(error);
+        if (error.code === 404) {
+            return res.status(404).json({ message: '잘못된 요청입니다.' });
+        } else {
+            return next(error);
+        }
     }
 });
+
 
 // 게시글 목록 조회
 groupController.get('/:id/posts', async (req, res, next) => {
