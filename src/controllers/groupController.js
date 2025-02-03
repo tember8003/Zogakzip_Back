@@ -296,6 +296,8 @@ groupController.post('/:id/posts', upload.single('image'), async (req, res, next
 
         // 추억 등록 서비스 호출
         const post = await postService.createPost(postData, groupId);
+        console.log("새로 생성된 게시글 데이터:", post);
+
         return res.status(201).json(post);
     } catch (error) {
         if (error.code === 404) {
