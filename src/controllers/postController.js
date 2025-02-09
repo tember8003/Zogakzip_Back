@@ -82,7 +82,7 @@ postController.delete('/:id', async (req, res, next) => {
 		const postId = parseInt(req.params.id, 10);
 
 		// 요청 본문에서 비밀번호 추출
-		const password = req.body.postPassword;
+		const password = req.body.password;
 
 		console.log(req.body);
 
