@@ -1,0 +1,8 @@
+POST http://localhost:3000/api/posts/1/comments
+Content-Type: application/json
+
+{
+	"nickname": "hong",
+	"content": "댓글1",
+	"password": "1234"
+}

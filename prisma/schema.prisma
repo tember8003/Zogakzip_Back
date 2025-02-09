@@ -1,0 +1,80 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Group {
+    id           Int      @id @default(autoincrement())
+    name         String   @unique
+    password     String
+    isPublic     Boolean
+    imageUrl     String?
+    likeCount    Int      @default(0)
+    postCount    Int      @default(0)
+    badgeCount   Int      @default(0)
+    introduction String?
+    createdAt    DateTime @default(now())
+    Badge        Badge[]
+    Post         Post[]
+}
+
+model Tag {
+    id   Int    @id @default(autoincrement())
+    name String @unique
+
+    posts PostTag[]
+}
+
+model Comment {
+    id        Int      @id @default(autoincrement())
+    nickname  String
+    content   String
+    password  String
+    createdAt DateTime @default(now())
+    post      Post     @relation(fields: [postId], references: [id])
+    postId    Int
+}
+
+model Badge {
+    id      Int    @id @default(autoincrement())
+    name    String
+    group   Group  @relation(fields: [groupId], references: [id])
+    groupId Int
+
+    // name과 groupId의 조합을 유니크로 설정 -> badge 등록 중 error가 발생하는 문제 해결용
+    @@unique([name, groupId])
+}
+
+model Post {
+    id           Int       @id @default(autoincrement())
+    nickname     String
+    title        String
+    password     String
+    content      String
+    imageUrl     String?
+    likeCount    Int       @default(0)
+    commentCount Int       @default(0)
+    moment       DateTime
+    createdAt    DateTime  @default(now())
+    isPublic     Boolean
+    location     String
+    group        Group     @relation(fields: [groupId], references: [id])
+    groupId      Int
+    Comment      Comment[]
+
+    tags PostTag[]
+}
+
+model PostTag {
+    id     Int  @id @default(autoincrement())
+    post   Post @relation(fields: [postId], references: [id])
+    postId Int
+    tag    Tag  @relation(fields: [tagId], references: [id])
+    tagId  Int
+
+    @@unique([postId, tagId])
+}
