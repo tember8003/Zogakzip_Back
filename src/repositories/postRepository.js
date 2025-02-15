@@ -147,19 +147,20 @@ async function getDetail(postId) {
 	const post = await prisma.post.findUnique({
 		where: { id: postId },
 		include: { 
-			postTags: { 
-				include: { tag: true }, // ✅ `tag` 테이블의 데이터 포함
+			tags: { // ✅ `PostTag`를 가져오려면 `tags`를 사용해야 함
+				include: { tag: true }, // ✅ `PostTag` 테이블에서 `tag`를 포함
 			},
 		},
 	});
 
-	if (!post) return null; // 게시글이 없으면 `null` 반환
+	if (!post) return null;
 
 	return {
-		...post, // 기존 게시글 정보 유지
-		tags: post.postTags.map(pt => pt.tag.name), // ✅ `tag.name`만 추출하여 배열로 변환
+		...post,
+		tags: post.tags.map(pt => pt.tag.name), // ✅ `tag.name`만 추출하여 배열로 변환
 	};
 }
+
 
 
 //댓글 목록 조회용
