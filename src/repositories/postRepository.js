@@ -130,7 +130,20 @@ async function updatePost(post) {
 }
 
 
-//게시글 상세 조회
+
+// 게시글 삭제를 위한 함수
+async function deletePostById(postId) {
+	const deletedPost = await prisma.post.delete({
+		where: {
+			id: postId,
+		},
+	});
+
+	return deletedPost;
+}
+
+
+//게시글 상세 조회용
 async function getDetail(postId) {
 	return prisma.post.findUnique({
 		where: {
@@ -159,7 +172,6 @@ async function getDetail(postId) {
 		},
 	});
 }
-
 
 //댓글 목록 조회용
 async function getComments(skip, take, postId) {
