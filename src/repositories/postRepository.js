@@ -130,13 +130,24 @@ async function updatePost(post) {
 			})),
 		});
 
-		// ✅ 업데이트된 게시글 반환
 		return postUpdate;
 	});
 
-	// ✅ 업데이트된 게시글을 반환해야 `filterSensitiveGroupData`에서 `post.password`를 읽을 수 있음
-	return updatedPost;
+	// ✅ 업데이트된 게시글 + 태그 정보 가져오기
+	const updatedPostWithTags = await prisma.post.findUnique({
+		where: { id: post.id },
+		include: { 
+			tags: { include: { tag: true } }, 
+		},
+	});
+
+	// ✅ 태그 정보를 배열로 변환
+	return {
+		...updatedPostWithTags,
+		tags: updatedPostWithTags.tags.map(pt => pt.tag.name), // `tags` 필드를 문자열 배열로 변환
+	};
 }
+
 
 
 
