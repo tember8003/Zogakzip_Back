@@ -152,15 +152,34 @@ async function updatePost(post) {
 
 
 
-// 게시글 삭제를 위한 함수
-async function deletePostById(postId) {
-	const deletedPost = await prisma.post.delete({
-		where: {
-			id: postId,
-		},
-	});
+// 그룹 삭제 함수
+async function deleteGroupById(group) {
+	return await prisma.$transaction(async (prisma) => {
+		const posts = await prisma.post.findMany({
+			where: { groupId: group.id },
+			select: { id: true },
+		});
 
-	return deletedPost;
+		const postIds = posts.map(post => post.id);
+
+		if (postIds.length > 0) {
+			await prisma.comment.deleteMany({
+				where: { postId: { in: postIds } },
+			});
+
+			await prisma.postTag.deleteMany({
+				where: { postId: { in: postIds } },
+			});
+
+			await prisma.post.deleteMany({
+				where: { id: { in: postIds } },
+			});
+		}
+
+		await prisma.group.delete({
+			where: { id: group.id },
+		});
+	});
 }
 
 
