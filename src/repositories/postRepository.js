@@ -143,35 +143,24 @@ async function deletePostById(postId) {
 }
 
 
-//게시글 상세 조회용
 async function getDetail(postId) {
-	return prisma.post.findUnique({
-		where: {
-			id: postId,
-		},
+	const post = await prisma.post.findUnique({
+		where: { id: postId },
 		include: { 
-			tags: {
-				include: {
-					tag: true, 
-				},
+			postTags: { 
+				include: { tag: true }, // ✅ `tag` 테이블의 데이터 포함
 			},
 		},
-		select: { 
-			id: true,
-			groupId: true,
-			nickname: true,
-			title: true,
-			imageUrl: true,
-			content: true,
-			location: true,
-			moment: true,
-			isPublic: true,
-			likeCount: true,
-			commentCount: true,
-			createdAt: true,
-		},
 	});
+
+	if (!post) return null; // 게시글이 없으면 `null` 반환
+
+	return {
+		...post, // 기존 게시글 정보 유지
+		tags: post.postTags.map(pt => pt.tag.name), // ✅ `tag.name`만 추출하여 배열로 변환
+	};
 }
+
 
 //댓글 목록 조회용
 async function getComments(skip, take, postId) {
