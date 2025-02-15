@@ -35,6 +35,9 @@ async function createPost(post, groupId) {
 
 //password같은 중요 데이터는 해싱되어 저장되므로 가져오지 않음.
 function filterSensitiveGroupData(post) {
+    if (!post) {
+		throw new Error("Post data is undefined");
+	}
     const { password, ...rest } = post;
     return rest;
 }

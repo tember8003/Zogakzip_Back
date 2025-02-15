@@ -53,7 +53,6 @@ async function createPost(post, groupId) {
 }
 
 
-
 async function findById(postId) {
 	return prisma.post.findUnique({
 		where: {
@@ -66,7 +65,7 @@ async function updatePost(post) {
 	const existingPost = await prisma.post.findUnique({
 		where: { id: post.id },
 		include: { 
-			tags: {  // ✅ `postTags` → `tags` 로 변경
+			tags: {  
 				include: { tag: true }, 
 			},
 		},
@@ -99,9 +98,9 @@ async function updatePost(post) {
 	// 최종 태그 리스트
 	const allTags = [...existingTagRecords, ...createdTags];
 
-	await prisma.$transaction(async (prisma) => {
+	const updatedPost = await prisma.$transaction(async (prisma) => {
 		// 게시글 업데이트
-		await prisma.post.update({
+		const postUpdate = await prisma.post.update({
 			where: { id: post.id },
 			data: {
 				nickname: post.nickname || existingPost.nickname,
@@ -130,7 +129,13 @@ async function updatePost(post) {
 				tagId: tag.id,
 			})),
 		});
+
+		// ✅ 업데이트된 게시글 반환
+		return postUpdate;
 	});
+
+	// ✅ 업데이트된 게시글을 반환해야 `filterSensitiveGroupData`에서 `post.password`를 읽을 수 있음
+	return updatedPost;
 }
 
 
