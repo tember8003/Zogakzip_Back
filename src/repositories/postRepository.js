@@ -65,13 +65,17 @@ async function findById(postId) {
 async function updatePost(post) {
 	const existingPost = await prisma.post.findUnique({
 		where: { id: post.id },
-		include: { postTags: { include: { tag: true } } },
+		include: { 
+			tags: {  // ✅ `postTags` → `tags` 로 변경
+				include: { tag: true }, 
+			},
+		},
 	});
 
 	if (!existingPost) throw new Error("Post not found");
 
 	// 기존 태그 리스트
-	const existingTags = existingPost.postTags.map(pt => pt.tag.name);
+	const existingTags = existingPost.tags.map(pt => pt.tag.name);
 	const newTags = Array.isArray(post.tags) ? post.tags : [];
 
 	// 추가해야 할 태그 (기존에 없는 태그)
@@ -128,6 +132,7 @@ async function updatePost(post) {
 		});
 	});
 }
+
 
 
 
