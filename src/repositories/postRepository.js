@@ -130,39 +130,26 @@ async function updatePost(post) {
 }
 
 
-
-// 게시글 삭제를 위한 함수
-async function deletePostById(postId) {
-	const deletedPost = await prisma.post.delete({
-		where: {
-			id: postId,
-		},
-	});
-
-	return deletedPost;
-}
-
-
-// 게시글 상세 조회
+//게시글 상세 조회
 async function getDetail(postId) {
 	return prisma.post.findUnique({
 		where: {
 			id: postId,
 		},
-		select: {
+		include: { 
+			tags: {
+				include: {
+					tag: true, 
+				},
+			},
+		},
+		select: { 
 			id: true,
 			groupId: true,
 			nickname: true,
 			title: true,
 			imageUrl: true,
 			content: true,
-			include: { // ✅ `tags` 필드에 연결된 `tag.name` 가져오기
-				tags: {
-					include: {
-						tag: true, // ✅ `tag` 객체 전체 포함
-					},
-				},
-			},
 			location: true,
 			moment: true,
 			isPublic: true,
@@ -172,6 +159,7 @@ async function getDetail(postId) {
 		},
 	});
 }
+
 
 //댓글 목록 조회용
 async function getComments(skip, take, postId) {
