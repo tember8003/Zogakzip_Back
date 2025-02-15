@@ -189,15 +189,41 @@ async function countPosts(name, publicCheck, groupId) {
 }
 
 
-//id를 통해 그룹 삭제하기
+// 그룹 삭제 함수
 async function deleteGroupById(group) {
-    const deletedGroup = await prisma.group.delete({
-        where: {
-            id: group.id,
-        },
-    });
-    return deletedGroup;
+	return await prisma.$transaction(async (prisma) => {
+		// 1️⃣ 해당 그룹의 게시글 ID 목록 가져오기
+		const posts = await prisma.post.findMany({
+			where: { groupId: group.id },
+			select: { id: true },
+		});
+
+		const postIds = posts.map(post => post.id);
+
+		if (postIds.length > 0) {
+			// 2️⃣ 게시글에 달린 댓글 삭제
+			await prisma.comment.deleteMany({
+				where: { postId: { in: postIds } },
+			});
+
+			// 3️⃣ 게시글 태그 연결 (`PostTag` 테이블) 삭제
+			await prisma.postTag.deleteMany({
+				where: { postId: { in: postIds } },
+			});
+
+			// 4️⃣ 게시글 삭제
+			await prisma.post.deleteMany({
+				where: { id: { in: postIds } },
+			});
+		}
+
+		// 5️⃣ 그룹 삭제
+		await prisma.group.delete({
+			where: { id: group.id },
+		});
+	});
 }
+
 
 //그룹 공감 누르기
 async function pushLike(group) {
