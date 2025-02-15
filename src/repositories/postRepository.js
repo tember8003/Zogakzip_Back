@@ -62,26 +62,73 @@ async function findById(postId) {
 	});
 }
 
-//게시글 수정(비밀번호 입력하여 추억 수정)
 async function updatePost(post) {
-	const existingPost = await findById(post.id);
+	const existingPost = await prisma.post.findUnique({
+		where: { id: post.id },
+		include: { postTags: { include: { tag: true } } },
+	});
 
-	// 게시글 업데이트
-	return prisma.post.update({
-		where: {
-			id: post.id,
-		},
-		data: {
-			nickname: post.nickname || existingPost.nickname,
-			content: post.content || existingPost.content,
-			title: post.title || existingPost.title,
-			imageUrl: post.imageUrl || existingPost.imageUrl,
-			//tags: post.tags ?? existingPost.tags,
-			location: post.location || existingPost.location,
-			isPublic: post.isPublic !== undefined ? post.isPublic : existingPost.isPublic,
-		},
+	if (!existingPost) throw new Error("Post not found");
+
+	// 기존 태그 리스트
+	const existingTags = existingPost.postTags.map(pt => pt.tag.name);
+	const newTags = Array.isArray(post.tags) ? post.tags : [];
+
+	// 추가해야 할 태그 (기존에 없는 태그)
+	const tagsToAdd = newTags.filter(tag => !existingTags.includes(tag));
+	// 삭제해야 할 태그 (새 리스트에 없는 기존 태그)
+	const tagsToRemove = existingTags.filter(tag => !newTags.includes(tag));
+
+	// 기존 태그 조회
+	const existingTagRecords = await prisma.tag.findMany({
+		where: { name: { in: tagsToAdd } },
+	});
+
+	const existingTagNames = existingTagRecords.map(tag => tag.name);
+	const newTagNames = tagsToAdd.filter(tag => !existingTagNames.includes(tag));
+
+	// 없는 태그 생성
+	const createdTags = await Promise.all(
+		newTagNames.map(name => prisma.tag.create({ data: { name } }))
+	);
+
+	// 최종 태그 리스트
+	const allTags = [...existingTagRecords, ...createdTags];
+
+	await prisma.$transaction(async (prisma) => {
+		// 게시글 업데이트
+		await prisma.post.update({
+			where: { id: post.id },
+			data: {
+				nickname: post.nickname || existingPost.nickname,
+				content: post.content || existingPost.content,
+				title: post.title || existingPost.title,
+				imageUrl: post.imageUrl || existingPost.imageUrl,
+				location: post.location || existingPost.location,
+				isPublic: post.isPublic !== undefined ? post.isPublic : existingPost.isPublic,
+			},
+		});
+
+		// 기존에 존재하지만 삭제해야 할 태그 연결 제거
+		if (tagsToRemove.length > 0) {
+			await prisma.postTag.deleteMany({
+				where: {
+					postId: post.id,
+					tag: { name: { in: tagsToRemove } },
+				},
+			});
+		}
+
+		// 새로운 태그와 게시글 연결
+		await prisma.postTag.createMany({
+			data: allTags.map(tag => ({
+				postId: post.id,
+				tagId: tag.id,
+			})),
+		});
 	});
 }
+
 
 
 // 게시글 삭제를 위한 함수
@@ -109,7 +156,13 @@ async function getDetail(postId) {
 			title: true,
 			imageUrl: true,
 			content: true,
-			tags: true,
+			include: { // ✅ `tags` 필드에 연결된 `tag.name` 가져오기
+				tags: {
+					include: {
+						tag: true, // ✅ `tag` 객체 전체 포함
+					},
+				},
+			},
 			location: true,
 			moment: true,
 			isPublic: true,

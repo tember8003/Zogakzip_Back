@@ -58,7 +58,9 @@ postController.put('/:id', upload.single('PutImage'), async (req, res, next) => 
 			isPublic = isPublic.toLowerCase() === 'true'; // 문자열 "true"는 true, 나머지는 false
 		}
 
-		const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`;
+		const imageUrl = req.file
+            ? `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`
+            : null;
 
 		const postData = { ...req.body, isPublic, imageUrl, password: inputPassword, id: postId };
 
