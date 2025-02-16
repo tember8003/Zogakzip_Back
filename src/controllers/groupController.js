@@ -313,7 +313,7 @@ groupController.post('/:id/posts', upload.single('image'), async (req, res, next
 groupController.get('/:id/posts', async (req, res, next) => {
     try {
         const page = parseInt(req.query.page, 10) || 1; // 페이지 번호
-        const pageSize = parseInt(req.query.pageSize, 10) || 5; // 페이지당 항목 수
+        const pageSize = parseInt(req.query.pageSize, 10) || 100; // 페이지당 항목 수
         const sortBy = req.query.sortBy || 'latest'; // 정렬 기준 (기본값: 최신순)
 
         const groupId = parseInt(req.params.id, 10);
