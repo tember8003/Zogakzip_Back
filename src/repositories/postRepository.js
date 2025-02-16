@@ -52,15 +52,15 @@ async function createPost(post, groupId) {
         const postWithTags = await prisma.post.findUnique({
             where: { id: createdPost.id },
             include: {
-                postTag: {
+                tags: { // ✅ 수정: `tags`를 올바르게 가져오기
                     include: {
-                        tag: true, // postTag 테이블을 통해 tag 테이블 가져오기
-                    },
-                },
+                        tag: true
+                    }
+                }
             },
         });
 
-        // 7️⃣ `postWithTags` 데이터 구조를 정리해서 반환
+        // 7️⃣ postWithTags 데이터 구조를 정리해서 반환
         return {
             id: postWithTags.id,
             nickname: postWithTags.nickname,
@@ -74,10 +74,11 @@ async function createPost(post, groupId) {
             isPublic: postWithTags.isPublic,
             location: postWithTags.location,
             groupId: postWithTags.groupId,
-            tags: postWithTags.postTag.map(pt => pt.tag.name), // 태그 배열 변환
+            tags: postWithTags.tags.map(t => t.tag.name), // ✅ 태그 목록을 올바르게 변환
         };
     });
 }
+
 
 
 
