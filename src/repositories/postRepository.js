@@ -1,56 +1,84 @@
 import prisma from '../config/prisma.js';
 import bcrypt from 'bcryptjs';
 
-//게시글 등록(닉네임, 제목, 이미지<한장>,본문,태그, 장소, 추억의 순간, 추억공개여부, 비밀번호 입력)
+// 게시글 등록(닉네임, 제목, 이미지<한장>, 본문, 태그, 장소, 추억의 순간, 추억공개여부, 비밀번호 입력)
 async function createPost(post, groupId) {
-	const hashedPassword = await bcrypt.hash(post.password, 10);
-	const tags = Array.isArray(post.tags) ? post.tags : [];
+    const hashedPassword = await bcrypt.hash(post.password, 10);
+    const tags = Array.isArray(post.tags) ? post.tags : [];
 
-	return prisma.$transaction(async (prisma) => {
-		// 1️⃣ 기존 태그 조회
-		const existingTags = await prisma.tag.findMany({
-			where: { name: { in: tags } }
-		});
+    return prisma.$transaction(async (prisma) => {
+        // 1️⃣ 기존 태그 조회
+        const existingTags = await prisma.tag.findMany({
+            where: { name: { in: tags } }
+        });
 
-		// 2️⃣ 없는 태그 생성
-		const existingTagNames = existingTags.map(tag => tag.name);
-		const newTags = tags.filter(tagName => !existingTagNames.includes(tagName));
+        // 2️⃣ 없는 태그 생성
+        const existingTagNames = existingTags.map(tag => tag.name);
+        const newTags = tags.filter(tagName => !existingTagNames.includes(tagName));
 
-		const createdTags = await Promise.all(
-			newTags.map(tagName => prisma.tag.create({ data: { name: tagName } }))
-		);
+        const createdTags = await Promise.all(
+            newTags.map(tagName => prisma.tag.create({ data: { name: tagName } }))
+        );
 
-		// 3️⃣ 모든 태그 합치기
-		const allTags = [...existingTags, ...createdTags];
+        // 3️⃣ 모든 태그 합치기
+        const allTags = [...existingTags, ...createdTags];
 
-		// 4️⃣ Post 생성
-		const createdPost = await prisma.post.create({
-			data: {
-				nickname: post.nickname,
-				title: post.title,
-				imageUrl: post.imageUrl || null,
-				content: post.content,
-				likeCount: 0,
-				commentCount: 0,
-				location: post.location,
-				moment: post.moment,
-				isPublic: post.isPublic,
-				password: hashedPassword,
-				groupId: groupId,
-			},
-		});
+        // 4️⃣ Post 생성
+        const createdPost = await prisma.post.create({
+            data: {
+                nickname: post.nickname,
+                title: post.title,
+                imageUrl: post.imageUrl || null,
+                content: post.content,
+                likeCount: 0,
+                commentCount: 0,
+                location: post.location,
+                moment: post.moment,
+                isPublic: post.isPublic,
+                password: hashedPassword,
+                groupId: groupId,
+            },
+        });
 
-		// 5️⃣ PostTag 중간 테이블에 데이터 삽입
-		await prisma.postTag.createMany({
-			data: allTags.map(tag => ({
-				postId: createdPost.id,
-				tagId: tag.id,
-			})),
-		});
+        // 5️⃣ PostTag 중간 테이블에 데이터 삽입
+        await prisma.postTag.createMany({
+            data: allTags.map(tag => ({
+                postId: createdPost.id,
+                tagId: tag.id,
+            })),
+        });
 
-		return createdPost;
-	});
+        // 6️⃣ 태그 포함된 게시글 정보 반환
+        const postWithTags = await prisma.post.findUnique({
+            where: { id: createdPost.id },
+            include: {
+                postTag: {
+                    include: {
+                        tag: true, // postTag 테이블을 통해 tag 테이블 가져오기
+                    },
+                },
+            },
+        });
+
+        // 7️⃣ `postWithTags` 데이터 구조를 정리해서 반환
+        return {
+            id: postWithTags.id,
+            nickname: postWithTags.nickname,
+            title: postWithTags.title,
+            content: postWithTags.content,
+            imageUrl: postWithTags.imageUrl,
+            likeCount: postWithTags.likeCount,
+            commentCount: postWithTags.commentCount,
+            moment: postWithTags.moment,
+            createdAt: postWithTags.createdAt,
+            isPublic: postWithTags.isPublic,
+            location: postWithTags.location,
+            groupId: postWithTags.groupId,
+            tags: postWithTags.postTag.map(pt => pt.tag.name), // 태그 배열 변환
+        };
+    });
 }
+
 
 
 async function findById(postId) {
