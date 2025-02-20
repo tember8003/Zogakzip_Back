@@ -202,6 +202,7 @@ postController.get('/:id/is-public', async (req, res, next) => {
 postController.post('/:id/comments', async (req, res, next) => {
 	try {
 		const id = parseInt(req.params.id, 10);
+		console.log("댓글 요청!!");
 		console.log(req.body);
 
 		const { nickname, password, content } = req.body;
