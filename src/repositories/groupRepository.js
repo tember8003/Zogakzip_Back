@@ -147,7 +147,7 @@ async function getPosts(skip, take, orderBy, name, publicCheck, groupId) {
     // 각 게시글마다 countComments 함수를 호출하여 댓글 수를 업데이트
     const postsWithCommentCounts = await Promise.all(
         posts.map(async post => {
-            const commentCount = await countComments(post.id);
+            const commentCount = await postRepository.countComments(post.id);
             return {
                 id: post.id,
                 nickname: post.nickname,
