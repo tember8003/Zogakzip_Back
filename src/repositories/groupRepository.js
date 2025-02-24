@@ -155,7 +155,7 @@ async function getPosts(skip, take, orderBy, name, publicCheck, groupId) {
         moment: post.moment,
         isPublic: post.isPublic,
         likeCount: post.likeCount,
-        commentCount: postRepository.countComments(post.id),
+        commentCount: post.commentCount,
         createdAt: post.createdAt,
         tags: post.tags.map(tag => tag.tag.name), // ✅ `tag` 객체에서 `name`만 추출
     }));
