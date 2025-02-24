@@ -122,7 +122,7 @@ async function getGroups(pageSkip, pageTake, orderBy, name, publicCheck) {
     return groups;
 }
 
-//게시글 목록 조회용
+// 게시글 목록 조회용
 async function getPosts(skip, take, orderBy, name, publicCheck, groupId) {
     const posts = await prisma.post.findMany({
         where: {
@@ -144,21 +144,27 @@ async function getPosts(skip, take, orderBy, name, publicCheck, groupId) {
         },
     });
 
+    // 각 게시글마다 countComments 함수를 호출하여 댓글 수를 업데이트
+    const postsWithCommentCounts = await Promise.all(
+        posts.map(async post => {
+            const commentCount = await countComments(post.id);
+            return {
+                id: post.id,
+                nickname: post.nickname,
+                title: post.title,
+                imageUrl: post.imageUrl,
+                location: post.location,
+                moment: post.moment,
+                isPublic: post.isPublic,
+                likeCount: post.likeCount,
+                commentCount: commentCount, // 동적으로 계산한 댓글 수 사용
+                createdAt: post.createdAt,
+                tags: post.tags.map(tag => tag.tag.name), // ✅ `tag` 객체에서 `name`만 추출
+            };
+        })
+    );
 
-    // ✅ `tags` 배열을 가공하여 `{ id, title, ..., tags: ["태그1", "태그2"] }` 형태로 변환
-    return posts.map(post => ({
-        id: post.id,
-        nickname: post.nickname,
-        title: post.title,
-        imageUrl: post.imageUrl,
-        location: post.location,
-        moment: post.moment,
-        isPublic: post.isPublic,
-        likeCount: post.likeCount,
-        commentCount: post.commentCount,
-        createdAt: post.createdAt,
-        tags: post.tags.map(tag => tag.tag.name), // ✅ `tag` 객체에서 `name`만 추출
-    }));
+    return postsWithCommentCounts;
 }
 
 

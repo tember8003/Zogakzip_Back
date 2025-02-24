@@ -200,7 +200,7 @@ async function getDetail(postId) {
 	});
 
 	if (!post) return null;
-	post.commentCount= countComments(postId);
+	post.commentCount= await countComments(postId);
 
 	return {
 		...post,
