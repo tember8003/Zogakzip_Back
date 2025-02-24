@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import postRepository from "./postRepository.js";
 import bcrypt from 'bcryptjs';
 
 //이름으로 그룹 찾기
@@ -143,6 +144,7 @@ async function getPosts(skip, take, orderBy, name, publicCheck, groupId) {
         },
     });
 
+
     // ✅ `tags` 배열을 가공하여 `{ id, title, ..., tags: ["태그1", "태그2"] }` 형태로 변환
     return posts.map(post => ({
         id: post.id,
@@ -153,7 +155,7 @@ async function getPosts(skip, take, orderBy, name, publicCheck, groupId) {
         moment: post.moment,
         isPublic: post.isPublic,
         likeCount: post.likeCount,
-        commentCount: post.commentCount,
+        commentCount: postRepository.countComments(post.id),
         createdAt: post.createdAt,
         tags: post.tags.map(tag => tag.tag.name), // ✅ `tag` 객체에서 `name`만 추출
     }));
