@@ -13,7 +13,6 @@ async function addComment(comment, postId) {
     }
 
     const createdComment = await commentRepository.createComment(comment, postId);
-    postRepository.plusComment(existedPost);
 
     return filterSensitiveCommentData(createdComment);
 };

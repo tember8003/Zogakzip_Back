@@ -200,6 +200,7 @@ async function getDetail(postId) {
 	});
 
 	if (!post) return null;
+	post.commentCount= countComments(postId);
 
 	return {
 		...post,
@@ -267,18 +268,6 @@ async function checkPostPublicStatus(postId) {
 	return foundPost;
 }
 
-//댓글 달면 commentCount +1
-async function plusComment(post) {
-	const foundPost = await prisma.post.update({
-		where: {
-			id: post.id,
-		},
-		data: {
-			commentCount: post.commentCount + 1,
-		},
-	});
-	return foundPost;
-}
 
 export default {
 	createPost,
@@ -288,7 +277,6 @@ export default {
 	getDetail,
 	addLike,
 	checkPostPublicStatus,
-	plusComment,
 	countComments,
 	getComments,
 }
