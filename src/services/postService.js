@@ -147,7 +147,7 @@ async function getDetail(postId) {
         throw error;
     }
 
-    existedPost.commentCount = postRepository.countComments(postId);
+    existedPost.commentCount = await postRepository.countComments(postId);
 
     return await postRepository.getDetail(postId);
 }
