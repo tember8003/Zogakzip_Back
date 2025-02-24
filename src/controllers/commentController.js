@@ -49,9 +49,12 @@ commentController.delete('/:id', async (req, res, next) => {
 			return res.status(400).json({ message: '잘못된 요청입니다.' });
 		}
 
+		console.log("삭제용으로 입력한 비밀번호:" + password);
+
 		const result = await commentService.deleteComment(commentId, password);
 
 		if (result) {
+			console.log("삭제 성공!");
 			return res.status(200).json({ message: '답글 삭제 성공' });
 		} else {
 			return res.status(403).json({ message: '비밀번호가 틀렸습니다.' });
