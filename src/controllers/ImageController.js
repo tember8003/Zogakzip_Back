@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import fs from 'fs'; // 파일 시스템 모듈
 
 const ImageController = express.Router();
 //이미지 URL 추출용 Controller
