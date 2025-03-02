@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
 // API 라우터 등록
 app.use('/api/groups', groupController);
 app.use('/api/posts', postController);
-app.use('/api/image', ImageController);
+app.use('/api/imageFile', ImageController);
 app.use('/api/comments', commentController);
 
 // 정적 파일 서비스
