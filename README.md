@@ -72,3 +72,22 @@
 |---------|--------------------------------------|----------------------|
 | <span style="color:#FF5733;"><b>POST</b></span>  | `/api/image`                            | 이미지 URL 생성       |
 
+## ERD (prisma-erd-generator)
+<img src="https://github.com/user-attachments/assets/59643b90-0d7c-4d4e-8b0b-0b47409f2387" width="600px">
+
+
+## 기본 실행 예시
+
+### **메인 페이지**
+<img src="https://github.com/user-attachments/assets/f688d7ad-4b90-43bf-85ee-0aeee314bf78" width="500px">
+
+### **그룹 등록**
+<img src="https://github.com/user-attachments/assets/9b72aab5-6310-4251-ab8c-7c90093c88ad" width="400px">
+<img src="https://github.com/user-attachments/assets/c4b08ca6-40ec-4cd2-91aa-690507f0b89b" width="400px">
+
+### **게시글 등록**
+<img src="https://github.com/user-attachments/assets/89a6d74f-47cb-4d25-a825-184870577d48" width="500px">
+
+### **댓글 등록**
+<img src="https://github.com/user-attachments/assets/36da6582-3044-459c-b04d-01020656c5fc" width="450px">
+
